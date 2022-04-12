@@ -1,0 +1,22 @@
+name: epimap_hg38
+channels:
+ - bioconda
+ - conda-forge
+ - r
+dependencies:
+  - scikit-learn
+  - anndata>=0.7.0
+  - scipy
+  - numpy
+  - pandas
+  - xgboost
+  - pyranges
+  - wget
+  - ucsc-liftover
+  - ucsc-bigwigaverageoverbed
+  - h5py
+  - coreutils
+  - gawk
+  - gzip
+  - requests
+  - ngboost

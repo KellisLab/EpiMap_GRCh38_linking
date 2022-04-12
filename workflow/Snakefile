@@ -1,0 +1,8 @@
+from snakemake.utils import min_version
+min_version("5.4")
+
+configfile: "config/config.yml"
+include: "rules/remap.smk"
+
+rule all:
+        input: list_bssid_link_files

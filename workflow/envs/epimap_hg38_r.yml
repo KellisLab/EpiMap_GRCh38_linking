@@ -1,0 +1,19 @@
+name: epimap_hg38_r
+channels:
+ - bioconda
+ - conda-forge
+ - r
+dependencies:
+  - ucsc-liftover
+  - ucsc-bigwigaverageoverbed
+  - bioconductor-genomicranges
+  - bioconductor-rhdf5
+  - bioconductor-org.hs.eg.db
+  - bioconductor-rtracklayer
+  - r-dplyr
+  - r-matrix
+  - r-data.table
+  - coreutils
+  - gawk
+  - gzip
+  - requests
