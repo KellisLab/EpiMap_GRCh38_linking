@@ -1,0 +1,32 @@
+hyper_links:
+        lift_over: "http://hgdownload.cse.ucsc.edu/goldenpath/hg38/liftOver/hg38ToHg19.over.chain.gz"
+        ccres_hg38: "http://users.wenglab.org/moorej3/Registry-cCREs-WG/V4-Files/V4-Alpha.GRCh38-cCREs.bed.gz"
+        annot_table: "https://personal.broadinstitute.org/cboix/epimap/metadata/table_for_compute_annotations_S2.tsv"
+        chromhmm: "https://personal.broadinstitute.org/cboix/epimap/ChromHMM/observed_aux_18_hg38/CALLS/"
+        sample_list: "https://personal.broadinstitute.org/cboix/epimap/metadata/samplelist_833_final.tsv"
+        gff: "https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_39/gencode.v39.annotation.gff3.gz"
+        rna: "https://personal.broadinstitute.org/cboix/epimap/rnaseq_data/merged_qn_log2fpkm.mtx.gz"
+local_links:
+        lift_over: "resources/hg38ToHg19.over.chain.gz"
+        ccres_hg38: "resources/V4-Alpha.GRCh38-cCREs.bed.gz"
+        ccres_hg19: "resources/V4-Alpha.GRCh37-cCREs.bed"
+        annot_table: "resources/table_for_compute_annotations_S2.tsv"
+        sample_list: "resources/samplelist_833_final.tsv"
+        mark_list: "resources/marklist.tsv"
+        chmm_h5ad: "resources/ChromHMM.h5ad"
+        gff: "resources/gene_loc.gff3.gz"
+        gene_bed: "resources/gene_loc.bed.gz"
+        rna: "resources/rna.mtx.gz"
+        chmm_list: "resources/ChromHMM_states.txt"
+params:
+        enhancer_overlap: 0.5
+        linking_range: 1000000
+        linking_cutoff: 0.00
+        linking_params: "--whiten --weighted-cor --spearman"
+chromhmm_states:
+  - EnhA1
+  - EnhA2
+  - EnhBiv
+  - EnhG1
+  - EnhG2
+  - EnhWk
