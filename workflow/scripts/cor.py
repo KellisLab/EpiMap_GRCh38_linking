@@ -5,7 +5,7 @@ import pandas as pd
 import scipy.stats
 import anndata
 
-def weighted_pearson_correlation(A, B, wt):
+def weighted_pearson_correlation(A, B, wt, eps=1e-16):
         wt = np.ravel(wt) / np.sum(wt)
         Am = (A.T - np.dot(A, wt)).T
         Bm = (B.T - np.dot(B, wt)).T
@@ -14,7 +14,7 @@ def weighted_pearson_correlation(A, B, wt):
         numer = np.dot(Am * Bm, wt)
         denom = np.sqrt(Am_sum_sq * Bm_sum_sq)
         cor = np.divide(numer, denom, out=np.zeros_like(numer), where=denom != 0)
-        return np.clip(cor, -1, 1)
+        return np.clip(cor, -1+eps, 1-eps)
 
 
 def index_of(values, idx):
@@ -23,15 +23,11 @@ def index_of(values, idx):
         assert np.all(idx[values_idx] == values)
         return values_idx
 
-def correlate(rna, mark, interactions, weight, batch_size=10000, whiten=True, spearman=True):
+def correlate(rna, mark, interactions, weight, batch_size=10000, power=1, spearman=True, eps=1e-16):
         logger = logging.getLogger("epimap.linking")
         out = np.zeros(interactions.shape[0])
         g_idx = index_of(interactions["gene"].values, rna.var.index.values)
         e_idx = index_of(interactions["enh"].values, mark.var.index.values)
-        if whiten:
-                power=0.5
-        else:
-                power=1.
         for i_begin in range(0, interactions.shape[0], batch_size):
                 i_end = min(i_begin + batch_size, interactions.shape[0])
                 logger.info("Finding correlations %d -> %d" % (i_begin, i_end))
@@ -42,10 +38,10 @@ def correlate(rna, mark, interactions, weight, batch_size=10000, whiten=True, sp
                 if spearman:
                         R = scipy.stats.rankdata(R, axis=0)
                         M = scipy.stats.rankdata(M, axis=0)
-                out[i_begin:i_end] = weighted_pearson_correlation(M.T, R.T, weight)
+                out[i_begin:i_end] = weighted_pearson_correlation(M.T, R.T, weight, eps=eps)
         return out
 
-def run_correlation(rna, mark, pinteractions, ninteractions, weight=None, whiten=False, eps=1e-10, spearman=False, batch_size=10000):
+def run_correlation(rna, mark, pinteractions, ninteractions, weight=None, power=1. eps=1e-16, spearman=False, batch_size=10000):
         logger = logging.getLogger("epimap.linking")
         comm_samples = np.intersect1d(rna.obs.index, mark.obs.index)
         wt = np.ones(len(comm_samples))
@@ -61,7 +57,7 @@ def run_correlation(rna, mark, pinteractions, ninteractions, weight=None, whiten
         M = mark[comm_samples,:]
         R = rna[comm_samples,:]
         logger.info("+ correlation")
-        P = correlate(R, M, pinteractions, wt, batch_size=batch_size, spearman=spearman, whiten=whiten)
+        P = correlate(R, M, pinteractions, wt, batch_size=batch_size, spearman=spearman, power=power, eps=eps)
         logger.info("- correlation")
-        N = correlate(R, M, ninteractions, wt, batch_size=batch_size, spearman=spearman, whiten=whiten)
+        N = correlate(R, M, ninteractions, wt, batch_size=batch_size, spearman=spearman, power=power, eps=eps)
         return (P, N)

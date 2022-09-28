@@ -16,7 +16,7 @@ import ngboost
 #from ngboost import NGBClassifier
 
 
-def load(tss, rna, chromhmm, bssid, state, enh_overlap, enh_range, seed, mark_list, whiten=True, weight=True, square=True, neg_ratio=5., spearman=False, npc=833, transpose=False):
+def load(tss, rna, chromhmm, bssid, state, enh_overlap, enh_range, seed, mark_list, power=[], weight=True, square=True, neg_ratio=5., spearman=False, npc=833, transpose=False):
         logger = logging.getLogger("epimap.linking")
         ## now to enhancer
         enh = load_enh(chromhmm, BSSID=bssid, state=state, min_overlap=enh_overlap)
@@ -28,8 +28,10 @@ def load(tss, rna, chromhmm, bssid, state, enh_overlap, enh_range, seed, mark_li
         neg_inter = negative_interactions(enh=enh, pos_interactions=pos_inter, seed=seed, size=neg_ratio)
 
         # now to loading marks and correlation
-        train_pos = np.zeros((pos_inter.shape[0], len(mark_list)))
-        train_neg = np.zeros((neg_inter.shape[0], len(mark_list)))
+        if power is None or len(power) == 0:
+                power = [1]
+        train_pos = np.zeros((pos_inter.shape[0], len(mark_list)*len(power)))
+        train_neg = np.zeros((neg_inter.shape[0], len(mark_list)*len(power)))
         for i, mark_file in enumerate(mark_list):
                 logger.info("Loading mark %s" % mark_file)
                 mark = load_mark(mark_file, enh, npc=npc, transpose=transpose)
@@ -37,14 +39,21 @@ def load(tss, rna, chromhmm, bssid, state, enh_overlap, enh_range, seed, mark_li
                         weight = bssid
                 else:
                         weight = None
-                (P, N) = run_correlation(rna, mark, pos_inter, neg_inter, weight=weight, whiten=whiten, spearman=spearman)
-                train_pos[:, i] = P
-                train_neg[:, i] = N
-                del mark, P, N
+                for j, p in enumerate(power):
+                        train_idx = i * len(power) + j
+                        logger.info("Running correlation for power %.2f for mark %s" % (p, mark_file))
+                        (P, N) = run_correlation(rna, mark, pos_inter, neg_inter, weight=weight, power=p, spearman=spearman)
+                        train_pos[:, train_idx] = P
+                        train_neg[:, train_idx] = N
+                        del mark, P, N
 #                pos_inter[os.path.basename(mark_file)] = P
         if square:
                 train_pos = train_pos**2
                 train_neg = train_neg**2
+        train_pos = np.clip(train_pos, -1+1e-16, 1-1e-16)
+        train_neg = np.clip(train_neg, -1+1e-16, 1-1e-16)
+        train_pos = np.arctanh(train_pos)
+        train_neg = np.arctanh(train_neg)
         return (pos_inter, neg_inter, train_pos, train_neg)
 
 def train_logistic(dfp, dfn, pos, neg):
@@ -110,8 +119,7 @@ if __name__ == "__main__":
         ap.add_argument("--range", dest="enh_range", default=1000000, type=int, help="Distance from TSS at which enhancers can be called. Measured from mid-DHS")
         ap.add_argument("--overlap", dest="enh_overlap", default=0., type=float, help="Percent of enhancer-ChromHMM state overlap required for a potential enhancer")
         ap.add_argument("--neg-ratio", dest="neg_ratio", default=5., type=float, help="Percent of negative links to provide")
-        ap.add_argument('--whiten', dest="whiten", action="store_true", help="Whether to de-correlate input data per-biosample before correlating enhancers and genes")
-        ap.add_argument('--no-whiten', dest="whiten", action="store_false")
+        ap.add_argument("--power", type=float, nargs="+")
         ap.add_argument("--weighted-cor", dest="weight", action="store_true")
         ap.add_argument("--no-weighted-cor", dest="weight", action="store_false")
         ap.add_argument("--dump", dest="dump", action="store_true")
@@ -135,7 +143,7 @@ if __name__ == "__main__":
         if args["dump"] and os.path.exists(args["output"]):
                 logger.info("File %s exists already" % args["output"])
                 sys.exit(1)
-        dfp, dfn, pos, neg = load(tss=args["tss"], rna=args["rna"], chromhmm=args["chromhmm"], bssid=args["bssid"], state=args["state"], enh_overlap=args["enh_overlap"], enh_range=args["enh_range"], seed=args["seed"], mark_list=args["mark"], whiten=args["whiten"], weight=args["weight"], square=args["square"], spearman=args["spearman"], neg_ratio=args["neg_ratio"], npc=args["npc"], transpose=args["transpose"])
+        dfp, dfn, pos, neg = load(tss=args["tss"], rna=args["rna"], chromhmm=args["chromhmm"], bssid=args["bssid"], state=args["state"], enh_overlap=args["enh_overlap"], enh_range=args["enh_range"], seed=args["seed"], mark_list=args["mark"], power=args["power"], weight=args["weight"], square=args["square"], spearman=args["spearman"], neg_ratio=args["neg_ratio"], npc=args["npc"], transpose=args["transpose"])
         if args["dump"]:
                 dump(dfp, dfn, pos, neg, mark_list=args["mark"], output=args["output"])
         if args["model"] == "logistic":
