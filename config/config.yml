@@ -22,7 +22,7 @@ params:
         enhancer_overlap: 0.5
         linking_range: 1000000
         linking_cutoff: 0.00
-        linking_params: "--whiten --weighted-cor --spearman"
+        linking_params: "--power 0 0.25 0.5 0.75 1 --weighted-cor --spearman"
 chromhmm_states:
   - EnhA1
   - EnhA2

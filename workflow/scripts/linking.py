@@ -134,7 +134,7 @@ if __name__ == "__main__":
         ap.add_argument("--no-square", dest="square", action="store_false", help="Whether to use square correlations or just Pearson correlations")
         ap.add_argument("--transpose", dest="transpose", action="store_true", help="Whether to use transposed PCA or just PCA")
         ap.add_argument("--no-transpose", dest="transpose", action="store_false", help="Whether to use transposed PCA or just PCA")
-        ap.set_defaults(whiten=False, log_level=logging.INFO, dump=False, square=True, weight=False, spearman=False, transpose=False)
+        ap.set_defaults(log_level=logging.INFO, dump=False, square=True, weight=False, spearman=False, transpose=False)
         args = vars(ap.parse_args())
         logging.basicConfig(level=args["log_level"], stream=sys.stdout)
         logger = logging.getLogger(args["output"])
