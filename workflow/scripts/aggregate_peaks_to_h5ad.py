@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import anndata
 import sys
-import argparse 
+import argparse
 import numpy as np
 import os, sys
 import pandas as pd
@@ -30,6 +30,7 @@ def run(input_list, output, sample_list, bed, col="mean"):
 			print("Bad file:", F[0], ", deleting")
 			os.unlink(F[0])
 			bad += 1
+			continue
 		if df.shape[1] == 6:
 			df.columns = ["name", "size", "covered", "sum", "mean0", "mean"]
 		elif df.shape[1] == 8:

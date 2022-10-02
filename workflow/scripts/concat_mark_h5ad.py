@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import anndata
 import sys
-import argparse 
+import argparse
 import numpy as np
 import os
 import pandas as pd
@@ -19,7 +19,7 @@ def download_chromhmm(bssid, url_base):
 	return pyranges.from_dict({"Chromosome": df[0].values,
 				   "Start": df[1].values,
 				   "End": df[2].values,
-				   "State": df[3].values})
+				   "State": df[3].str.replace("/", ".").values})
 
 def index_of(values, idx):
 	sort_idx = np.argsort(idx)
@@ -27,7 +27,7 @@ def index_of(values, idx):
 	assert np.all(idx[values_idx] == values)
 	return values_idx
 
-	
+
 def get_chmm_overlaps(bssid, url_base, ccre, adata):
 	ccre_pr = pyranges.from_dict({"Chromosome": ccre["chrom"].values,
 				      "Start": ccre["begin"].values,
@@ -83,5 +83,3 @@ if __name__ == "__main__":
 		chmm = tbl["chromhmm"]
 		states = tbl["states"]
 	run(input_list=input_list, output=str(tbl["output"]), chromhmm_url=chmm, states=states)
-
-
