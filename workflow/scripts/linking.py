@@ -45,8 +45,8 @@ def load(tss, rna, chromhmm, bssid, state, enh_overlap, enh_range, seed, mark_li
                         (P, N) = run_correlation(rna, mark, pos_inter, neg_inter, weight=weight, power=p, spearman=spearman)
                         train_pos[:, train_idx] = P
                         train_neg[:, train_idx] = N
-                        del mark, P, N
-#                pos_inter[os.path.basename(mark_file)] = P
+                        del P, N
+                del mark
         if square:
                 train_pos = train_pos**2
                 train_neg = train_neg**2
