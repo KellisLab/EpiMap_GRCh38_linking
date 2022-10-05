@@ -30,3 +30,15 @@ chromhmm_states:
   - EnhG1
   - EnhG2
   - EnhWk
+  - Het
+  - Quies
+  - ReprPC
+  - ReprPCWk
+  - TssA
+  - TssBiv
+  - TssFlnk
+  - TssFlnkD
+  - TssFlnkU
+  - Tx
+  - TxWk
+  - ZNF.Rpts
