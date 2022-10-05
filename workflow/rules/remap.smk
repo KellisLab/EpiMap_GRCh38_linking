@@ -71,7 +71,7 @@ rule linking_perchmm:
     output: "resources/link_{bssid}_{state}.bed.gz"
     conda: "../envs/epimap_hg38.yml"
     log: "log/linking_perchromhmm_{bssid}_{state}.log"
-    shell: "/home/benjames/bin/time -v python3 workflow/scripts/linking.py --bssid {params.bssid} --state {params.state} --chromhmm {input.chromhmm}  --mark resources/DNase-seq.h5ad resources/H3K27ac.h5ad resources/H3K4me1.h5ad resources/H3K4me2.h5ad resources/H3K4me3.h5ad resources/H3K9ac.h5ad -o {output} --tss {input.gene_loc} --overlap {params.overlap} --range {params.enh_range} --cutoff {params.cutoff} --rna {input.rna} {params.other}"
+    shell: "$(type -P time) python3 workflow/scripts/linking.py --bssid {params.bssid} --state {params.state} --chromhmm {input.chromhmm}  --mark resources/DNase-seq.h5ad resources/H3K27ac.h5ad resources/H3K4me1.h5ad resources/H3K4me2.h5ad resources/H3K4me3.h5ad resources/H3K9ac.h5ad -o {output} --tss {input.gene_loc} --overlap {params.overlap} --range {params.enh_range} --cutoff {params.cutoff} --rna {input.rna} {params.other}"
 
 rule build_mark_h5ad:
     input:

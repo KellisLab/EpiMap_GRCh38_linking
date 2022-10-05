@@ -41,7 +41,7 @@ def correlate(rna, mark, interactions, weight, batch_size=10000, power=1, spearm
                 out[i_begin:i_end] = weighted_pearson_correlation(M.T, R.T, weight, eps=eps)
         return out
 
-def run_correlation(rna, mark, pinteractions, ninteractions, weight=None, power=1. eps=1e-16, spearman=False, batch_size=10000):
+def run_correlation(rna, mark, pinteractions, ninteractions, weight=None, power=1, eps=1e-16, spearman=False, batch_size=10000):
         logger = logging.getLogger("epimap.linking")
         comm_samples = np.intersect1d(rna.obs.index, mark.obs.index)
         wt = np.ones(len(comm_samples))
